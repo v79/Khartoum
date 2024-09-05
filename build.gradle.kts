@@ -13,7 +13,15 @@ repositories {
 
 kotlin {
     linuxArm64("pi") {
-     /*   compilations {
+        compilations.getByName("main") {
+            cinterops {
+                val libcurl by creating {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/libcurl.def"))
+                    includeDirs("src/include/curl")
+                }
+            }
+        }
+         /* compilations {
             "main" {
                 cinterops {
                     val libbcm by cinterops.creating {}
