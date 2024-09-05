@@ -17,7 +17,7 @@ enum class EPDModel(
     val pixelHeight: Int,
     val pins: EPDPins,
     val colours: Set<EPDColours>,
-    val buttons: Set<Int>? = emptySet()
+    val buttons: Set<uint8_t>? = emptySet()
 ) {
     // THIS IS NOT V2!
     TWO_IN7_B(
@@ -29,7 +29,7 @@ enum class EPDModel(
             power = 18u
         ),
         colours = setOf(EPDColours.WHITE, EPDColours.BLACK, EPDColours.RED),
-        buttons = setOf(5, 6, 13, 19)
+        buttons = setOf(5u,6u, 13u, 19u)
     ),
     TWO_IN7(
         modelNumber = "2.7 inch", pixelWidth = 176, pixelHeight = 264, pins = EPDPins(

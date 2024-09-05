@@ -11,26 +11,26 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
 
     val uint8_ZERO: uint8_t = 0u
     val uint8_ONE: uint8_t = 1u
-    val buttonActions: MutableMap<Int, () -> Unit> = mutableMapOf()
+    val buttonActions: MutableMap<uint8_t, () -> Unit> = mutableMapOf()
     private val bcmLOW = LOW.toUByte()
 
     init {
         println("Call GPIOInit")
         GPIOInit()
 
-        println("Begin SPI Interface")
+        println("\tBegin SPI Interface")
         bcm2835_spi_begin()  //Start spi interface, set spi pin for the reuse function
-        println("Set SPI Bit Order ${SPIBitOrder.MSB_FIRST}")
+        println("\tSet SPI Bit Order ${SPIBitOrder.MSB_FIRST}")
         bcm2835_spi_setBitOrder(SPIBitOrder.MSB_FIRST.value)     //High first transmission
-        println("Set SPI Data mode ${SPIMode.MODE_0}")
+        println("\tSet SPI Data mode ${SPIMode.MODE_0}")
         bcm2835_spi_setDataMode(SPIMode.MODE_0.value)                  //spi mode 0
 
 
-        println("Set SPI Clock divider ${SPIClockDivider.DIVIDER_128}")
+        println("\tSet SPI Clock divider ${SPIClockDivider.DIVIDER_128}")
         bcm2835_spi_setClockDivider(SPIClockDivider.DIVIDER_128.value)  //Frequency
-        println("Set SPI ChipSelect ${SPIChipSelect.CS0}")
+        println("\tSet SPI ChipSelect ${SPIChipSelect.CS0}")
         bcm2835_spi_chipSelect(SPIChipSelect.CS0.value)                     //set CE0
-        println("Enable SPI ChipSelect Polarity ${SPIChipSelect.CS0}")
+        println("\tEnable SPI ChipSelect Polarity ${SPIChipSelect.CS0}")
         bcm2835_spi_setChipSelectPolarity(SPIChipSelect.CS0.value, bcmLOW)     //enable cs0
 
         initializeModel()
@@ -49,29 +49,29 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 //https://github.com/waveshareteam/e-Paper/blob/a824b4f8f34dee7e721183c0154788dcde41c460/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_2in7b.c#L237
 
                 sendCommand(0x06u);         //boost soft start
-                sendData (0x07u);		//A
-                sendData (0x07u);		//B
-                sendData (0x17u);		//C
+                sendData(0x07u);        //A
+                sendData(0x07u);        //B
+                sendData(0x17u);        //C
 
                 sendCommand(0x04u);
                 readBusy();//waiting for the electronic paper IC to release the idle signal
 
-                sendCommand(0x00u);			//panel setting
-                sendData(0x0fu);		//LUT from OTP￡?128x296
+                sendCommand(0x00u);            //panel setting
+                sendData(0x0fu);        //LUT from OTP￡?128x296
 
                 sendCommand(0x16u);
-                sendData(0x00u);				//KW-BF   KWR-AF	BWROTP 0f
+                sendData(0x00u);                //KW-BF   KWR-AF	BWROTP 0f
 
                 sendCommand(0xF8u);         //boostéè?¨
-                sendData (0x60u);
+                sendData(0x60u);
                 sendData(0xa5u);
 
                 sendCommand(0xF8u);         //boostéè?¨
-                sendData (0x90u);
-                sendData (0x00u);
+                sendData(0x90u);
+                sendData(0x00u);
 
                 sendCommand(0xF8u);         //boostéè?¨
-                sendData (0x93u);
+                sendData(0x93u);
                 sendData(0x2Au);
 
                 sendCommand(0x01u); // PANEL_SETTING
@@ -92,7 +92,8 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
         }
         println("Initialization complete")
 
-//        initializeKeys()
+        // when this function is called, the linux terminal stops displaying text, the screen continues to refresh, then the pi crashes
+        initializeKeys()
     }
 
     override fun clear() {
@@ -226,7 +227,6 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     override fun delay(ms: UInt) {
         platform.posix.sleep(ms / 1000u)
         bcm2835_delay(ms)
-        println("--$ms Delay complete")
     }
 
     override fun exit() {
@@ -249,7 +249,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
         setPinMode(model.pins.dataHighCommandLow, 1u)
         setPinMode(model.pins.chipSelect, 1u)
         setPinMode(model.pins.busy, 0u)
-        setPinMode(model.pins.power,1u)
+        setPinMode(model.pins.power, 1u)
         digitalWrite(model.pins.chipSelect, 1u)
         digitalWrite(model.pins.power, 1u)
     }
@@ -282,7 +282,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     }
 
     override fun readBusy() {
-        println("e-Paper busy")
+        println("\\\\ e-Paper busy //")
         when (model) {
             //https://github.com/waveshareteam/e-Paper/blob/a824b4f8f34dee7e721183c0154788dcde41c460/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_2in7b_V2.c#L79
             EPDModel.TWO_IN7_B -> {
@@ -296,7 +296,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
 
             EPDModel.TWO_IN7 -> TODO("Not yet implemented")
         }
-        println("e-Paper busy release")
+        println("//e-Paper busy release\\\\")
     }
 
     /**
@@ -324,15 +324,24 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
      * For each of the buttons on the display, initialize them as pull-up inputs
      */
     private fun initializeKeys() {
+        println("Initializing keys")
         if (!model.buttons.isNullOrEmpty()) {
-            println("Initializing keys")
-            for (key in model.buttons) {
-                setPinMode(key.toUByte(), FunctionSelect.INPUT.value)
+            println("\tThere are ${model.buttons.size} keys on ${model.name}")
+            delay(200u)
+            readBusy()
+            println("\tBut I'm not going to enter the loop to set each key")
+            /*for (key in model.buttons) {
+                println("\t\tSetting key $key to pin mode FunctionSelect.INPUT")
+                setPinMode(key, FunctionSelect.INPUT.value)
                 // TODO: wrap the bcm2835 calls, perhaps a more general setPin(pin,mode,pud,len) option?
-                bcm2835_gpio_set_pud(key.toUByte(), PUDControl.PUD_UP.value)
-                bcm2835_gpio_hen(key.toUByte())
-            }
-            println("Keys initialized")
+                bcm2835_gpio_set_pud(key, PUDControl.PUD_UP.value)
+                bcm2835_gpio_hen(key)
+                delay(100u)
+                readBusy()
+            }*/
+            println("Keys NOT initialized")
+        } else {
+            println("Model has no keys to initialize")
         }
     }
 
@@ -340,7 +349,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
      * Loop round each of the buttons. If one has been pressed, invoke the function defined for that button
      * and return the key number
      */
-    fun pollKeys(): Int? {
+    fun pollKeys(): uint8_t? {
         if (!model.buttons.isNullOrEmpty()) {
             for (key in model.buttons) {
                 val lev: uint8_t = bcm2835_gpio_lev(key.toUByte())

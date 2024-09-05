@@ -26,7 +26,7 @@ kotlin {
         }
         binaries {
             executable {
-                this.optimized = false
+//                this.optimized = false
                 entryPoint = "org.liamjd.pi.main"
             }
         }
