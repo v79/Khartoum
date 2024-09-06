@@ -329,16 +329,15 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
             println("\tThere are ${model.buttons.size} keys on ${model.name}")
             delay(200u)
             readBusy()
-            println("\tBut I'm not going to enter the loop to set each key")
-            /*for (key in model.buttons) {
+            for (key in model.buttons) {
                 println("\t\tSetting key $key to pin mode FunctionSelect.INPUT")
                 setPinMode(key, FunctionSelect.INPUT.value)
                 // TODO: wrap the bcm2835 calls, perhaps a more general setPin(pin,mode,pud,len) option?
                 bcm2835_gpio_set_pud(key, PUDControl.PUD_UP.value)
-                bcm2835_gpio_hen(key)
+//                bcm2835_gpio_hen(key)  // enable rising edge detection // THIS LINE CRASHES THE PI
                 delay(100u)
                 readBusy()
-            }*/
+            }
             println("Keys NOT initialized")
         } else {
             println("Model has no keys to initialize")

@@ -44,6 +44,9 @@ fun main() {
     val ePaper = EPaperDisplay(EPDModel.TWO_IN7_B).also {
         it.clear()
         it.delay(2000u)
+        it.buttonActions[5u] = {
+            println("^^ Button 5 pressed")
+        }
     }
 
     ePaper.readBusy()
@@ -74,6 +77,17 @@ fun main() {
 
     println("Displaying black and red images")
     ePaper.display(arrayOf(blackImage.bytes, redImage.bytes))
+
+    var halt = false;
+
+    println("Polling for key presses")
+    do {
+        val keyPressed = ePaper.pollKeys()
+        if(keyPressed != null) {
+            println("Key pressed: $keyPressed")
+            halt = true
+        }
+    } while (!halt)
 
     // shut down ePaper
     ePaper.sleep()
