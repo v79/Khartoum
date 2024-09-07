@@ -3,6 +3,7 @@ package org.liamjd.pi.ePaper
 import kotlinx.cinterop.ExperimentalForeignApi
 import libbcm.*
 import org.liamjd.pi.bcm.*
+import org.liamjd.pi.console.printDebug
 import platform.posix.uint8_t
 
 @ExperimentalForeignApi
@@ -24,8 +25,6 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
         bcm2835_spi_setBitOrder(SPIBitOrder.MSB_FIRST.value)     //High first transmission
         println("\tSet SPI Data mode ${SPIMode.MODE_0}")
         bcm2835_spi_setDataMode(SPIMode.MODE_0.value)                  //spi mode 0
-
-
         println("\tSet SPI Clock divider ${SPIClockDivider.DIVIDER_128}")
         bcm2835_spi_setClockDivider(SPIClockDivider.DIVIDER_128.value)  //Frequency
         println("\tSet SPI ChipSelect ${SPIChipSelect.CS0}")
@@ -282,7 +281,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     }
 
     override fun readBusy() {
-        println("\\\\ e-Paper busy //")
+        printDebug("\\\\ e-Paper busy //")
         when (model) {
             //https://github.com/waveshareteam/e-Paper/blob/a824b4f8f34dee7e721183c0154788dcde41c460/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_2in7b_V2.c#L79
             EPDModel.TWO_IN7_B -> {
