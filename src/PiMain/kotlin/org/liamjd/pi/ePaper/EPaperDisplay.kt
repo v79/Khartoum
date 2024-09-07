@@ -16,35 +16,35 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     private val bcmLOW = LOW.toUByte()
 
     init {
-        println("Call GPIOInit")
+        printDebug("Call GPIOInit")
         GPIOInit()
 
-        println("\tBegin SPI Interface")
+        printDebug("\tBegin SPI Interface")
         bcm2835_spi_begin()  //Start spi interface, set spi pin for the reuse function
-        println("\tSet SPI Bit Order ${SPIBitOrder.MSB_FIRST}")
+        printDebug("\tSet SPI Bit Order ${SPIBitOrder.MSB_FIRST}")
         bcm2835_spi_setBitOrder(SPIBitOrder.MSB_FIRST.value)     //High first transmission
-        println("\tSet SPI Data mode ${SPIMode.MODE_0}")
+        printDebug("\tSet SPI Data mode ${SPIMode.MODE_0}")
         bcm2835_spi_setDataMode(SPIMode.MODE_0.value)                  //spi mode 0
-        println("\tSet SPI Clock divider ${SPIClockDivider.DIVIDER_128}")
+        printDebug("\tSet SPI Clock divider ${SPIClockDivider.DIVIDER_128}")
         bcm2835_spi_setClockDivider(SPIClockDivider.DIVIDER_128.value)  //Frequency
-        println("\tSet SPI ChipSelect ${SPIChipSelect.CS0}")
+        printDebug("\tSet SPI ChipSelect ${SPIChipSelect.CS0}")
         bcm2835_spi_chipSelect(SPIChipSelect.CS0.value)                     //set CE0
-        println("\tEnable SPI ChipSelect Polarity ${SPIChipSelect.CS0}")
+        printDebug("\tEnable SPI ChipSelect Polarity ${SPIChipSelect.CS0}")
         bcm2835_spi_setChipSelectPolarity(SPIChipSelect.CS0.value, bcmLOW)     //enable cs0
 
         initializeModel()
-        println("Model initialized; ready to display")
+        printDebug("Model initialized; ready to display")
     }
 
     /**
      * Initialize the ePaper device, making it ready to receive commands and display images
      */
     private fun initializeModel() {
-        println("Initializing model $model")
+        printDebug("Initializing model $model")
         when (model) {
             EPDModel.TWO_IN7_B -> {
                 reset()
-                println("Sending initialization commands:")
+                printDebug("Sending initialization commands:")
                 //https://github.com/waveshareteam/e-Paper/blob/a824b4f8f34dee7e721183c0154788dcde41c460/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_2in7b.c#L237
 
                 sendCommand(0x06u);         //boost soft start
@@ -89,21 +89,21 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 TODO("Not yet implemented")
             }
         }
-        println("Initialization complete")
+        printDebug("Initialization complete")
 
         // when this function is called, the linux terminal stops displaying text, the screen continues to refresh, then the pi crashes
         initializeKeys()
     }
 
     override fun clear() {
-        println("Clearing displays")
+        printDebug("Clearing displays")
         val width: Int = if (model.pixelWidth % 8 == 0) model.pixelWidth / 8 else model.pixelWidth / 8 + 1
         val height: Int = model.pixelHeight
 
         when (model) {
             EPDModel.TWO_IN7_B -> {
                 // clear black
-                println("\tClearing black image")
+                printDebug("\tClearing black image")
                 sendCommand(0x10u)
                 for (j in 0 until height) {
                     for (i in 0 until width) {
@@ -113,7 +113,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 sendCommand(0x11u) // DATA_STOP
 
                 // clear red
-                println("\tClearing red image")
+                printDebug("\tClearing red image")
                 sendCommand(0x13u)
                 for (j in 0 until height) {
                     for (i in 0 until width) {
@@ -130,7 +130,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 TODO("Not yet implemented")
             }
         }
-        println("Clearing complete")
+        printDebug("Clearing complete")
     }
 
     override fun display(images: Array<UByteArray>) {
@@ -144,7 +144,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 }
                 sendCommand(0x10u)
 
-                println("Displaying black image")
+                printDebug("Displaying black image")
                 for (j in 0 until height) {
                     for (i in 0 until width) {
                         sendData(images[0][i + j * width])
@@ -152,7 +152,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 }
                 sendCommand(0x11u) // DATA_STOP
 
-                println("Displaying red image")
+                printDebug("Displaying red image")
                 sendCommand(0x13u)
                 for (j in 0 until height) {
                     for (i in 0 until width) {
@@ -176,7 +176,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     override fun sleep() {
         when (model) {
             EPDModel.TWO_IN7_B -> {
-                println("Going to sleep")
+                printDebug("Going to sleep")
                 sendCommand(0x50u)
                 sendData(0xf7u)
                 sendCommand(0x02u) //power off
@@ -229,7 +229,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     }
 
     override fun exit() {
-        println("Shutting down interface")
+        printDebug("Shutting down interface")
         digitalWrite(model.pins.chipSelect, LOW.toUByte())
         digitalWrite(model.pins.power, LOW.toUByte())
         digitalWrite(model.pins.dataHighCommandLow, LOW.toUByte())
@@ -243,7 +243,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
      * Initialize the ePaper device GPIO pins
      */
     private fun GPIOInit() {
-        println("Initializing pins")
+        printDebug("Initializing pins")
         setPinMode(model.pins.reset, 1u)
         setPinMode(model.pins.dataHighCommandLow, 1u)
         setPinMode(model.pins.chipSelect, 1u)
@@ -262,7 +262,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     }
 
     override fun reset() {
-        println("Resetting $model")
+        printDebug("Resetting $model")
         when (model) {
             EPDModel.TWO_IN7_B -> {
                 // reset by sending 1,0,1 to the reset pin
@@ -277,7 +277,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
 
             EPDModel.TWO_IN7 -> TODO("Not yet implemented")
         }
-        println("\tReset done")
+        printDebug("\tReset done")
     }
 
     override fun readBusy() {
@@ -295,7 +295,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
 
             EPDModel.TWO_IN7 -> TODO("Not yet implemented")
         }
-        println("//e-Paper busy release\\\\")
+        printDebug("//e-Paper busy release\\\\")
     }
 
     /**
@@ -323,13 +323,13 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
      * For each of the buttons on the display, initialize them as pull-up inputs
      */
     private fun initializeKeys() {
-        println("Initializing keys")
+        printDebug("Initializing keys")
         if (!model.buttons.isNullOrEmpty()) {
-            println("\tThere are ${model.buttons.size} keys on ${model.name}")
+            printDebug("\tThere are ${model.buttons.size} keys on ${model.name}")
             delay(200u)
             readBusy()
             for (key in model.buttons) {
-                println("\t\tSetting key $key to pin mode FunctionSelect.INPUT")
+                printDebug("\t\tSetting key $key to pin mode FunctionSelect.INPUT")
                 setPinMode(key, FunctionSelect.INPUT.value)
                 // TODO: wrap the bcm2835 calls, perhaps a more general setPin(pin,mode,pud,len) option?
                 bcm2835_gpio_set_pud(key, PUDControl.PUD_UP.value)
@@ -337,9 +337,9 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 delay(100u)
                 readBusy()
             }
-            println("Keys NOT initialized")
+            printDebug("Keys NOT initialized")
         } else {
-            println("Model has no keys to initialize")
+            printDebug("Model has no keys to initialize")
         }
     }
 
@@ -357,7 +357,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                         delay(1000u)
                         return key
                     } else {
-                        println("no action defined for keypress $key")
+                        printDebug("no action defined for keypress $key")
                     }
                     delay(100u)
                 }
