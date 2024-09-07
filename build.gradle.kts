@@ -36,8 +36,15 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
         }
         commonTest.dependencies {
-            implementation(kotlin("test"))
+
+            implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
         }
+
+        /*
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+         */
     }
 }
