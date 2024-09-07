@@ -12,7 +12,7 @@ repositories {
 }
 
 kotlin {
-    linuxArm64("pi") {
+    linuxArm64 {
         compilations.getByName("main") {
             cinterops {
                 val libcurl by creating {
@@ -32,11 +32,12 @@ kotlin {
     }
 
     sourceSets {
-        val piMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
-            }
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(kotlin("test-annotations-common"))
         }
     }
-    jvmToolchain(17)
 }

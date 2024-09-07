@@ -1,11 +1,5 @@
 package org.liamjd.pi.khartoum
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.convert
-import org.liamjd.pi.console.printDebug
-import platform.posix.u_int16_t
-import org.liamjd.pi.ePaper.EPDModel
-import platform.posix.uint16_t
 
 
 /**
@@ -14,7 +8,6 @@ import platform.posix.uint16_t
  * @param pixelHeight the height of the image in pixels
  */
 @ExperimentalUnsignedTypes
-@ExperimentalForeignApi
 class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: Int = 0) {
 
     @ExperimentalUnsignedTypes
@@ -27,14 +20,14 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
         private set
     private val widthByte: Int
     private val heightByte: Int
-    private val imageSize: u_int16_t
+    private val imageSize: Int
     private val zeroByte: UByte = 0u
 
     init {
         imageSize = if (pixelWidth % 8 == 0) {
-            (((pixelWidth / 8) * 16) * pixelHeight).convert<uint16_t>()
+            (((pixelWidth / 8) * 16) * pixelHeight)
         } else {
-            (((pixelWidth / 8 + 1) * 16) * pixelHeight).convert<uint16_t>()
+            (((pixelWidth / 8 + 1) * 16) * pixelHeight)
         }
         bytes = UByteArray(imageSize.toInt())
         heightByte = pixelHeight
@@ -389,7 +382,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
                 width = pixelHeight
                 height = pixelWidth
             }
-            printDebug("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
+            println("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
         }
         bytes.fill(zeroByte)
     }

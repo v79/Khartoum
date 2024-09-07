@@ -6,8 +6,6 @@ import org.liamjd.pi.console.printErr
 import org.liamjd.pi.datasources.Clock
 import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.ePaper.EPaperDisplay
-import org.liamjd.pi.khartoum.KhartoumImage
-import org.liamjd.pi.khartoum.Rotation
 import platform.posix.exit
 
 /**
