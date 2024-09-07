@@ -3,6 +3,7 @@ package org.liamjd.pi
 import kotlinx.cinterop.ExperimentalForeignApi
 import libbcm.bcm2835_init
 import org.liamjd.pi.console.printErr
+import org.liamjd.pi.datasources.Clock
 import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.ePaper.EPaperDisplay
 import org.liamjd.pi.khartoum.KhartoumImage
@@ -23,7 +24,12 @@ fun main() {
         println("bcm2835_init() succeeded and ready to initialize ePaper")
     }
 
-    var mode: DisplayMode = Clock()
+    val clockMode = Clock()
+    val spotify = Spotify()
+    val weather = Weather()
+    val shutdown = Shutdown()
+
+    var mode: DisplayMode = clockMode
 
     // Initialize the ePaper display
     println("Initializing ePaper display")
@@ -32,26 +38,26 @@ fun main() {
         it.delay(2000u)
 
         it.buttonActions[5u] = {
-           mode = Spotify()
+           mode = spotify
         }
         it.buttonActions[6u] = {
-            mode = Clock()
+            mode = clockMode
         }
         it.buttonActions[13u] = {
-            mode = Weather()
+            mode = weather
         }
         it.buttonActions[19u] = {
-            mode = Shutdown()
+            mode = shutdown
         }
+        // must call refresh to set the initial image
+        mode.refresh(it.model)
     }
 
     ePaper.readBusy()
 
-    // Set up the paintable images
-    val blackImage = KhartoumImage(ePaperModel = ePaper.model)
-    val redImage = KhartoumImage(ePaperModel = ePaper.model)
-    blackImage.reset(Rotation.CW)
-    redImage.reset(Rotation.CW)
+    // display the initial image
+    println("Displaying initial image for mode $mode")
+    ePaper.display(mode.images)
 
     // Enter the main loop
     println("Polling for button presses")
@@ -59,12 +65,15 @@ fun main() {
         val buttonPressed = ePaper.pollKeys()
         if (buttonPressed != null) {
            println("Switching to mode $mode")
+            mode.refresh(ePaper.model)
+            ePaper.display(mode.images)
         }
     } while (mode !is Shutdown)
 
     // Shut down the ePaper display
     // shut down ePaper
     println("Shutting down ePaper display and exiting")
+    ePaper.clear()
     ePaper.sleep()
     ePaper.exit()
 

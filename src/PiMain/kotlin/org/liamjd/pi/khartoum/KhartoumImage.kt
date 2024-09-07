@@ -2,26 +2,28 @@ package org.liamjd.pi.khartoum
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
+import org.liamjd.pi.console.printDebug
 import platform.posix.u_int16_t
 import org.liamjd.pi.ePaper.EPDModel
 import platform.posix.uint16_t
 
 
 /**
- * Construct a Khartoum image buffer for the given Waveshare ePaper model
- * [ePaperModel]
+ * Construct a Khartoum image buffer with the given [pixelWidth] and [pixelHeight]
+ * @param pixelWidth the width of the image in pixels
+ * @param pixelHeight the height of the image in pixels
  */
 @ExperimentalUnsignedTypes
 @ExperimentalForeignApi
-class KhartoumImage(val ePaperModel: EPDModel) {
+class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: Int = 0) {
 
     @ExperimentalUnsignedTypes
     val bytes: UByteArray
     var rotation = Rotation.ZERO
         private set
-    var width = ePaperModel.pixelWidth
+    var width = pixelWidth
         private set
-    var height = ePaperModel.pixelHeight
+    var height = pixelHeight
         private set
     private val widthByte: Int
     private val heightByte: Int
@@ -29,17 +31,17 @@ class KhartoumImage(val ePaperModel: EPDModel) {
     private val zeroByte: UByte = 0u
 
     init {
-        imageSize = if (ePaperModel.pixelWidth % 8 == 0) {
-            (((ePaperModel.pixelWidth / 8) * 16) * ePaperModel.pixelHeight).convert<uint16_t>()
+        imageSize = if (pixelWidth % 8 == 0) {
+            (((pixelWidth / 8) * 16) * pixelHeight).convert<uint16_t>()
         } else {
-            (((ePaperModel.pixelWidth / 8 + 1) * 16) * ePaperModel.pixelHeight).convert<uint16_t>()
+            (((pixelWidth / 8 + 1) * 16) * pixelHeight).convert<uint16_t>()
         }
         bytes = UByteArray(imageSize.toInt())
-        heightByte = ePaperModel.pixelHeight
-        widthByte = if (ePaperModel.pixelWidth % 8 == 0) {
-            (ePaperModel.pixelWidth / 8)
+        heightByte = pixelHeight
+        widthByte = if (pixelWidth % 8 == 0) {
+            (pixelWidth / 8)
         } else {
-            (ePaperModel.pixelWidth / 8 + 1)
+            (pixelWidth / 8 + 1)
         }
     }
 
@@ -50,15 +52,15 @@ class KhartoumImage(val ePaperModel: EPDModel) {
 
         val x = when (rotation) {
             Rotation.NONE, Rotation.ZERO -> xPoint
-            Rotation.CW -> ePaperModel.pixelWidth - yPoint - 1
-            Rotation.ONEEIGHTY -> ePaperModel.pixelWidth - xPoint - 1
+            Rotation.CW -> pixelWidth - yPoint - 1
+            Rotation.ONEEIGHTY -> pixelWidth - xPoint - 1
             Rotation.CCW -> yPoint
         }
         val y = when (rotation) {
             Rotation.NONE, Rotation.ZERO -> yPoint
             Rotation.CW -> xPoint
-            Rotation.ONEEIGHTY -> ePaperModel.pixelHeight - yPoint - 1
-            Rotation.CCW -> ePaperModel.pixelHeight - xPoint - 1
+            Rotation.ONEEIGHTY -> pixelHeight - yPoint - 1
+            Rotation.CCW -> pixelHeight - xPoint - 1
         }
 
         if (xPoint > width || yPoint > height) {
@@ -326,33 +328,49 @@ class KhartoumImage(val ePaperModel: EPDModel) {
         return (DrawDimensions(x + xStart, maxY, textLines))
     }
 
-    fun measureString(string: String, font: KhFont, wrapMode: TextWrapMode): DrawDimensions {
-        val rawLength = string.length * font.width
-        var maxX: Int = 0
-        var maxY = font.height
-        var textLines: Int = 1
-        when (wrapMode) {
-            TextWrapMode.TRUNCATE -> {
-                maxX = if (rawLength >= width) {
-                    width
-                } else {
-                    rawLength
+    /**
+     * TODO: This is VERY crude implementation
+     * Measure the dimensions of the text [string] using the font [font] and the text wrapping mode [wrapMode]
+     * Returns an object containing the x and y co-ordinates of the end of the drawn text, and the number of lines needed to draw this.
+     */
+    fun measureString(string: String, font: KhFont, wrapMode: TextWrapMode, rotation: Rotation): DrawDimensions {
+        // maximum width of the text in pixels. If it's wider than the display, it will be wrapped or truncated
+        var textWidth = when(rotation) {
+            Rotation.NONE, Rotation.ZERO -> {
+                string.length * font.width
+            }
+            Rotation.CW, Rotation.CCW -> {
+                string.length * font.height
+            }
+
+            Rotation.ONEEIGHTY -> { string.length * font.width}
+        }
+
+        var textLines = 1
+
+        if (textWidth > width) {
+            when (wrapMode) {
+                TextWrapMode.TRUNCATE -> {
+                    textWidth = width
                 }
-            }
 
-            TextWrapMode.ELLIPSIS -> {
-                TODO("What to do in ellipsis wrap mode?")
-            }
+                TextWrapMode.ELLIPSIS -> {
+                    // TODO: what to do in ellipsis wrap mode?
+                    textWidth = width
+                }
 
-            TextWrapMode.WRAP -> {
-                if (rawLength >= width) {
-                    textLines = (rawLength / width) + 1
-                } else {
-                    maxX = rawLength
+                TextWrapMode.WRAP -> {
+                    // when wrapping, the text will be split into multiple lines
+                    // but the width of the text will be the same as the display width until I start tokenizing and wrapping over spaces etc
+                    textWidth = width
+                    textLines++
                 }
             }
         }
-        return DrawDimensions(maxX, maxY, textLines)
+
+        var textHeight = font.height * textLines
+
+        return DrawDimensions(textWidth, textHeight, textLines)
     }
 
 
@@ -365,13 +383,13 @@ class KhartoumImage(val ePaperModel: EPDModel) {
         if (clrRotation != Rotation.NONE) {
             rotation = clrRotation
             if (rotation == Rotation.ZERO || rotation == Rotation.ONEEIGHTY) {
-                width = ePaperModel.pixelWidth
-                height = ePaperModel.pixelHeight
+                width = pixelWidth
+                height = pixelHeight
             } else {
-                width = ePaperModel.pixelHeight
-                height = ePaperModel.pixelWidth
+                width = pixelHeight
+                height = pixelWidth
             }
-            println("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
+            printDebug("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
         }
         bytes.fill(zeroByte)
     }
@@ -479,8 +497,8 @@ class KhartoumImage(val ePaperModel: EPDModel) {
     fun debugImage() {
         println("Debug display bytes for image")
         val debugWidth: Int =
-            if (ePaperModel.pixelWidth % 8 == 0) ePaperModel.pixelWidth / 8 else ePaperModel.pixelWidth / 8 + 1
-        val debugHeight: Int = ePaperModel.pixelHeight
+            if (pixelWidth % 8 == 0) pixelWidth / 8 else pixelWidth / 8 + 1
+        val debugHeight: Int = pixelHeight
         for (i in 0 until debugHeight) {
             for (j in 0 until debugWidth) {
                 val hex = (bytes[i + j * debugWidth]).toString(16)

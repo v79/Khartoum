@@ -51,8 +51,8 @@ fun oldMain() {
 
     ePaper.readBusy()
 
-    val blackImage = KhartoumImage(ePaperModel = ePaper.model)
-    val redImage = KhartoumImage(ePaperModel = ePaper.model)
+    val blackImage = KhartoumImage(ePaper.model.pixelWidth, ePaper.model.pixelHeight)
+    val redImage = KhartoumImage(ePaper.model.pixelWidth, ePaper.model.pixelHeight)
 
     blackImage.reset(Rotation.CW)
     redImage.reset(Rotation.CW)
