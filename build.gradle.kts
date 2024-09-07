@@ -26,7 +26,6 @@ kotlin {
         }
         binaries {
             executable {
-//                this.optimized = false
                 entryPoint = "org.liamjd.pi.main"
             }
         }
@@ -39,5 +38,5 @@ kotlin {
             }
         }
     }
+    jvmToolchain(17)
 }
-
