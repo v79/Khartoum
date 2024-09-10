@@ -26,26 +26,49 @@ interface DisplayMode {
 
 
 class Spotify(override val id: uint8_t = 6u) : DisplayMode {
+    private var black: KhartoumImage = KhartoumImage(0, 0)
+    private var red: KhartoumImage = KhartoumImage(0, 0)
+
     override fun toString(): String {
-        return "Spotify"
+        return "Clock"
     }
 
-    override val images: Array<UByteArray> = arrayOf()
+    override val images
+        get() = arrayOf(black.bytes, red.bytes)
+
 
     override fun refresh(ePaperModel: EPDModel) {
-        TODO("Not yet implemented")
+        println("Spotify not implemented yet :)")
+
+        black = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        red = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        black.reset(Rotation.CW)
+        red.reset(Rotation.CW)
+        black.drawString(1, 1, "Spotify", KhFont.CascadiaCodeSemiBold24, false, wrapMode = TextWrapMode.WRAP)
     }
 }
 
 
 class Weather(override val id: uint8_t = 13u) : DisplayMode {
+    private var black: KhartoumImage = KhartoumImage(0, 0)
+    private var red: KhartoumImage = KhartoumImage(0, 0)
+
     override fun toString(): String {
-        return "Weather"
+        return "Clock"
     }
 
-    override val images: Array<UByteArray> = arrayOf()
+    override val images
+        get() = arrayOf(black.bytes, red.bytes)
+
+
     override fun refresh(ePaperModel: EPDModel) {
-        TODO("Not yet implemented")
+        println("Weather not implemented yet :)")
+
+        black = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        red = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        black.reset(Rotation.CW)
+        red.reset(Rotation.CW)
+        black.drawString(1, 1, "Weather", KhFont.CascadiaCodeSemiBold24, false, wrapMode = TextWrapMode.WRAP)
     }
 }
 
@@ -64,21 +87,16 @@ class Shutdown(override val id: uint8_t = 19u) : DisplayMode {
 
     @OptIn(ExperimentalNativeApi::class)
     override fun refresh(ePaperModel: EPDModel) {
+        black = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
         red = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        black.reset(Rotation.CW)
         red.reset(Rotation.CW)
-        val message = "Shutdown down"
-        val messageSize = red.measureString(message, KhFont.CascadiaCodeSemiBold24, TextWrapMode.WRAP, Rotation.CW)
-        println("Message size: $messageSize")
-        val startX = (ePaperModel.pixelWidth - messageSize.x) / 2
-        val startY = (ePaperModel.pixelHeight - messageSize.y) / 2
-        println("Start X: $startX, Start Y: $startY")
-        assert(startX >= 0 && startX <= ePaperModel.pixelWidth)
-        assert(startY >= 0 && startY <= ePaperModel.pixelHeight)
+        val message = "Shutdown"
 
         red.drawString(
-            startX,
-            startY,
-            "Shutting down",
+            0,
+            0,
+            message,
             font = KhFont.CascadiaCodeSemiBold24,
             wrapMode = TextWrapMode.WRAP
         )

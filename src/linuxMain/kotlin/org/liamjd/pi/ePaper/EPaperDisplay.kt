@@ -144,6 +144,10 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 }
                 sendCommand(0x10u)
 
+                if(images[0].isEmpty()) {
+                    printDebug("No black image supplied")
+                    return
+                }
                 printDebug("Displaying black image")
                 for (j in 0 until height) {
                     for (i in 0 until width) {
@@ -152,6 +156,10 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 }
                 sendCommand(0x11u) // DATA_STOP
 
+                if(images[1].isEmpty()) {
+                    printDebug("No red image supplied")
+                    return
+                }
                 printDebug("Displaying red image")
                 sendCommand(0x13u)
                 for (j in 0 until height) {
