@@ -271,7 +271,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
     }
 
     /**
-     * Write the text [string] starting at co-oridinates [xStart],[yStart] using the font [font]
+     * Write the text [string] starting at co-ordinates [xStart],[yStart] using the font [font]
      * If [invert] is specified, the colours will be inverted, e.g. white-on-black.
      * Returns an object containing the x and y co-ordinates of the end of the drawn text, and the number of lines needed to draw this.
      */
@@ -318,7 +318,19 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
                 }
             }
         }
-        return (DrawDimensions(x + xStart, maxY, textLines))
+        return (DrawDimensions(xStart, yStart, x + xStart, maxY, textLines))
+    }
+
+    /**
+     * Write the text [string] starting at the centre of the image, using the font [font]
+     * Returns an object containing the x and y co-ordinates of the end of the drawn text, and the number of lines needed to draw this.
+     */
+    fun centreString(string: String, font: KhFont, wrapMode: TextWrapMode, rotation: Rotation): DrawDimensions {
+        val dimensions = measureString(string, font, wrapMode, rotation)
+        val x = (width - dimensions.w) / 2
+        val y = (height - dimensions.h) / 2
+        drawString(x, y, string, font, false, wrapMode)
+        return DrawDimensions(x,y, dimensions.w, dimensions.h, dimensions.textLines)
     }
 
     /**
@@ -361,9 +373,9 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
             }
         }
 
-        var textHeight = font.height * textLines
+        val textHeight = font.height * textLines
 
-        return DrawDimensions(textWidth, textHeight, textLines)
+        return DrawDimensions(0,0, textWidth, textHeight, textLines)
     }
 
 
@@ -517,7 +529,7 @@ enum class Rotation {
     CCW
 }
 
-data class DrawDimensions(val x: Int, val y: Int, val textLines: Int = 0)
+data class DrawDimensions(val x: Int, val y: Int, val w: Int, val h: Int, val textLines: Int = 0)
 
 /**
  * Specify the text wrapping mode - what should happen when the text string is wider than the display?
