@@ -18,7 +18,7 @@ import org.liamjd.pi.khartoum.TextWrapMode
 import platform.posix.exit
 
 @OptIn(ExperimentalForeignApi::class)
-fun main() {
+fun oldMain() {
     println("Hello, from Kotlin Native!")
 
     val now = Clock.System.now()
@@ -51,8 +51,8 @@ fun main() {
 
     ePaper.readBusy()
 
-    val blackImage = KhartoumImage(ePaperModel = ePaper.model)
-    val redImage = KhartoumImage(ePaperModel = ePaper.model)
+    val blackImage = KhartoumImage(ePaper.model.pixelWidth, ePaper.model.pixelHeight)
+    val redImage = KhartoumImage(ePaper.model.pixelWidth, ePaper.model.pixelHeight)
 
     blackImage.reset(Rotation.CW)
     redImage.reset(Rotation.CW)
