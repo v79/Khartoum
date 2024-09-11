@@ -12,7 +12,7 @@ repositories {
 }
 
 kotlin {
-    linuxArm64("pi") {
+    linuxArm64 {
         compilations.getByName("main") {
             cinterops {
                 val libcurl by creating {
@@ -26,18 +26,34 @@ kotlin {
         }
         binaries {
             executable {
-//                this.optimized = false
                 entryPoint = "org.liamjd.pi.main"
             }
         }
     }
 
-    sourceSets {
-        val piMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
-            }
-        }
-    }
-}
+    mingwX64()
 
+    /*  jvm() {
+      }*/
+
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
+        }
+        commonTest.dependencies {
+            implementation(kotlin("test-common"))
+            implementation(kotlin("test-annotations-common"))
+        }
+
+        /* jvmTest.dependencies {
+             implementation(kotlin("test-junit"))
+         }*/
+        /*
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+        }
+         */
+    }
+    jvmToolchain(17)
+}

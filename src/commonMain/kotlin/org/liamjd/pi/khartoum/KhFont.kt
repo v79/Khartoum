@@ -1159,5 +1159,3 @@ enum class KhFont(val table: UByteArray, val width: Int, val height: Int, val by
 		3196, // Character 0x7e (126: '~')
 	))
 }
-
-
