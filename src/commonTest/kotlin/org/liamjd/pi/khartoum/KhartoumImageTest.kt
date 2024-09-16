@@ -68,6 +68,28 @@ class KhartoumImageTest {
         assertEquals(drawnDimensions.h, 34, "Height is ${drawnDimensions.h}, expected 34")
         assertEquals(drawnDimensions.textLines, 1, "Expected 1 line, got ${drawnDimensions.textLines}")
     }
+
+    @Test
+    fun `can centre short text vertically only`() {
+        val message = "Vertical"
+        val khartoumImage = KhartoumImage(200, 200)
+        val dimensions =
+            khartoumImage.measureString(message, KhFont.CascadiaCodeSemiBold24, TextWrapMode.WRAP, Rotation.NONE)
+        println("Measured: $dimensions")
+        val drawDimensions =
+            khartoumImage.centreString(
+                message,
+                KhFont.CascadiaCodeSemiBold24,
+                TextWrapMode.WRAP,
+                Rotation.NONE,
+                horizontal = false,
+                vertical = true
+            )
+        println("Drawn: $drawDimensions")
+
+        assertTrue(drawDimensions.x == 0, "x is ${drawDimensions.x}")
+        assertTrue(drawDimensions.y > 0, "y is ${drawDimensions.y}")
+    }
 }
 
 

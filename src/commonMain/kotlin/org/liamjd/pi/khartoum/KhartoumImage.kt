@@ -1,7 +1,6 @@
 package org.liamjd.pi.khartoum
 
 
-
 /**
  * Construct a Khartoum image buffer with the given [pixelWidth] and [pixelHeight]
  * @param pixelWidth the width of the image in pixels
@@ -323,14 +322,27 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
 
     /**
      * Write the text [string] starting at the centre of the image, using the font [font]
+     * @param [string] the text to write
+     * @param [font] the font to use
+     * @param [wrapMode] the text wrapping mode (experimental/not implemented)
+     * @param [rotation] the rotation of the screen
+     * @param [horizontal] whether to centre horizontally, default true
+     * @param [vertical] whether to centre vertically, default false
      * Returns an object containing the x and y co-ordinates of the end of the drawn text, and the number of lines needed to draw this.
      */
-    fun centreString(string: String, font: KhFont, wrapMode: TextWrapMode, rotation: Rotation): DrawDimensions {
+    fun centreString(
+        string: String,
+        font: KhFont,
+        wrapMode: TextWrapMode,
+        rotation: Rotation,
+        horizontal: Boolean = true,
+        vertical: Boolean = false
+    ): DrawDimensions {
         val dimensions = measureString(string, font, wrapMode, rotation)
-        val x = (width - dimensions.w) / 2
-        val y = (height - dimensions.h) / 2
+        val x = if(horizontal) { (width - dimensions.w) / 2 } else 0
+        val y = if(vertical) { (height - dimensions.h) / 2 } else 0
         drawString(x, y, string, font, false, wrapMode)
-        return DrawDimensions(x,y, dimensions.w, dimensions.h, dimensions.textLines)
+        return DrawDimensions(x, y, dimensions.w, dimensions.h, dimensions.textLines)
     }
 
     /**
@@ -340,15 +352,18 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
      */
     fun measureString(string: String, font: KhFont, wrapMode: TextWrapMode, rotation: Rotation): DrawDimensions {
         // maximum width of the text in pixels. If it's wider than the display, it will be wrapped or truncated
-        var textWidth = when(rotation) {
+        var textWidth = when (rotation) {
             Rotation.NONE, Rotation.ZERO -> {
                 string.length * font.width
             }
+
             Rotation.CW, Rotation.CCW -> {
                 string.length * font.height
             }
 
-            Rotation.ONEEIGHTY -> { string.length * font.width}
+            Rotation.ONEEIGHTY -> {
+                string.length * font.width
+            }
         }
 
         var textLines = 1
@@ -375,7 +390,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
 
         val textHeight = font.height * textLines
 
-        return DrawDimensions(0,0, textWidth, textHeight, textLines)
+        return DrawDimensions(0, 0, textWidth, textHeight, textLines)
     }
 
 
