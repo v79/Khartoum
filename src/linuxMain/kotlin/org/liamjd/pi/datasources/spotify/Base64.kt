@@ -1,4 +1,4 @@
-package org.liamjd.pi
+package org.liamjd.pi.datasources.spotify
 
 const val dictionaryOfBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 

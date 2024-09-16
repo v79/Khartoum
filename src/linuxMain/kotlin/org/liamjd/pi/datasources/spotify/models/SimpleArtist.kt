@@ -1,7 +1,8 @@
-package org.liamjd.pi.spotify.currentlyPlaying
+package org.liamjd.pi.datasources.spotify.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.liamjd.pi.datasources.spotify.models.ExternalUrls
 
 @Serializable
 data class SimpleArtist(

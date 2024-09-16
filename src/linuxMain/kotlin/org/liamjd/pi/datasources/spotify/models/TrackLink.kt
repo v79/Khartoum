@@ -1,18 +1,19 @@
-package org.liamjd.pi.spotify.currentlyPlaying
+package org.liamjd.pi.datasources.spotify.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.liamjd.pi.datasources.spotify.models.ExternalUrls
 
 @Serializable
 class TrackLink(
-	@SerialName("external_urls")
+    @SerialName("external_urls")
 	val externalUrls: ExternalUrls,
-	@SerialName("href")
+    @SerialName("href")
 	val href: String?,
-	@SerialName("id")
+    @SerialName("id")
 	val id: String,
-	@SerialName("type")
+    @SerialName("type")
 	val type: String = "track",
-	@SerialName("uri")
+    @SerialName("uri")
 	val uri: String?
 )

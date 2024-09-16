@@ -1,8 +1,9 @@
-package org.liamjd.pi.spotify.currentlyPlaying
+package org.liamjd.pi.datasources.spotify.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/* https://developer.spotify.com/documentation/web-api/reference/get-the-users-currently-playing-track */
 /** An Item is either a Full Track object or a Full Episode object */
 @Serializable
 data class Item(
