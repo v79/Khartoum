@@ -382,7 +382,6 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
                 width = pixelHeight
                 height = pixelWidth
             }
-            println("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
         }
         bytes.fill(zeroByte)
     }

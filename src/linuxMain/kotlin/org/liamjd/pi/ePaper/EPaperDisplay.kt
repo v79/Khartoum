@@ -236,6 +236,12 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
         bcm2835_delay(ms)
     }
 
+    override fun shutdown() {
+        clear()
+        sleep()
+        exit()
+    }
+
     override fun exit() {
         printDebug("Shutting down interface")
         digitalWrite(model.pins.chipSelect, LOW.toUByte())
@@ -358,11 +364,11 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
     fun pollKeys(): uint8_t? {
         if (!model.buttons.isNullOrEmpty()) {
             for (key in model.buttons) {
-                val lev: uint8_t = bcm2835_gpio_lev(key.toUByte())
+                val lev: uint8_t = bcm2835_gpio_lev(key)
                 if (lev == uint8_ZERO) {
                     if (buttonActions[key] != null) {
                         buttonActions[key]?.invoke()
-                        delay(1000u)
+//                        delay(1000u)
                         return key
                     } else {
                         printDebug("no action defined for keypress $key")
@@ -431,4 +437,10 @@ interface EPaperDisplayCommands {
      * Set the [mode] of the given [pin]. The mode is typically "high" (1u) or "low" (0u)
      */
     fun setPinMode(pin: UByte, mode: UByte)
+
+    /**
+     * Shut down the device, bring it to a zero power state.
+     * Typically, this will clear, sleep and exit the device
+     */
+    fun shutdown()
 }
