@@ -1,6 +1,7 @@
 package org.liamjd.pi.khartoum
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 
@@ -27,8 +28,10 @@ class KhartoumImageTest {
         println("test width ~ ${message.length * KhFont.CascadiaCodeSemiBold24.width}")
         val khartoumImage = KhartoumImage(200, 200)
         val dimensions = khartoumImage.measureString(message, KhFont.CascadiaCodeSemiBold24, TextWrapMode.WRAP, Rotation.NONE)
+        println("Dimensions are $dimensions")
         assertTrue(dimensions.x > 0, "x dimension is ${dimensions.x}")
         assertTrue(dimensions.x < 200, "x dimension is ${dimensions.x}")
+        assertEquals(1,dimensions.textLines)
     }
 }
 
