@@ -11,7 +11,6 @@ import kotlin.experimental.ExperimentalNativeApi
 
 /**
  * Interface for the display modes that the ePaper display can show
- * @param id the unique identifier for the display mode, which corresponds to the button press
  */
 interface DisplayMode {
     val id: uint8_t
