@@ -53,7 +53,7 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 sendData(0x17u)        //C
 
                 sendCommand(0x04u)
-                readBusy();//waiting for the electronic paper IC to release the idle signal
+                readBusy()//waiting for the electronic paper IC to release the idle signal
 
                 sendCommand(0x00u)           //panel setting
                 sendData(0x0fu)        //LUT from OTP￡?128x296
