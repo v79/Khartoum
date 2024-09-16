@@ -47,38 +47,38 @@ class EPaperDisplay(val model: EPDModel) : EPaperDisplayCommands {
                 printDebug("Sending initialization commands:")
                 //https://github.com/waveshareteam/e-Paper/blob/a824b4f8f34dee7e721183c0154788dcde41c460/RaspberryPi_JetsonNano/c/lib/e-Paper/EPD_2in7b.c#L237
 
-                sendCommand(0x06u);         //boost soft start
-                sendData(0x07u);        //A
-                sendData(0x07u);        //B
-                sendData(0x17u);        //C
+                sendCommand(0x06u)         //boost soft start
+                sendData(0x07u)        //A
+                sendData(0x07u)        //B
+                sendData(0x17u)        //C
 
-                sendCommand(0x04u);
+                sendCommand(0x04u)
                 readBusy();//waiting for the electronic paper IC to release the idle signal
 
-                sendCommand(0x00u);            //panel setting
-                sendData(0x0fu);        //LUT from OTP￡?128x296
+                sendCommand(0x00u)           //panel setting
+                sendData(0x0fu)        //LUT from OTP￡?128x296
 
-                sendCommand(0x16u);
-                sendData(0x00u);                //KW-BF   KWR-AF	BWROTP 0f
+                sendCommand(0x16u)
+                sendData(0x00u)               //KW-BF   KWR-AF	BWROTP 0f
 
-                sendCommand(0xF8u);         //boostéè?¨
-                sendData(0x60u);
-                sendData(0xa5u);
+                sendCommand(0xF8u)         //boostéè?¨
+                sendData(0x60u)
+                sendData(0xa5u)
 
-                sendCommand(0xF8u);         //boostéè?¨
-                sendData(0x90u);
-                sendData(0x00u);
+                sendCommand(0xF8u)         //boostéè?¨
+                sendData(0x90u)
+                sendData(0x00u)
 
-                sendCommand(0xF8u);         //boostéè?¨
-                sendData(0x93u);
-                sendData(0x2Au);
+                sendCommand(0xF8u)         //boostéè?¨
+                sendData(0x93u)
+                sendData(0x2Au)
 
-                sendCommand(0x01u); // PANEL_SETTING
-                sendData(0x03u); // VDS_EN, VDG_EN
-                sendData(0x00u); // VCOM_HV, VGHL_LV[1], VGHL_LV[0]
-                sendData(0x2bu); // VDH
-                sendData(0x2bu); // VDL
-                sendData(0x2bu); // VDHR
+                sendCommand(0x01u) // PANEL_SETTING
+                sendData(0x03u) // VDS_EN, VDG_EN
+                sendData(0x00u) // VCOM_HV, VGHL_LV[1], VGHL_LV[0]
+                sendData(0x2bu) // VDH
+                sendData(0x2bu) // VDL
+                sendData(0x2bu) // VDHR
 
                 readBusy()
                 delay(150u)
