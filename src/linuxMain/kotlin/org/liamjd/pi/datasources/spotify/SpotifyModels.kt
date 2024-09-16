@@ -1,4 +1,4 @@
-package org.liamjd.pi.spotify
+package org.liamjd.pi.datasources.spotify
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

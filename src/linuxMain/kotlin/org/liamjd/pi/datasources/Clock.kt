@@ -1,9 +1,11 @@
 package org.liamjd.pi.datasources
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.datetime.*
 import kotlinx.datetime.Clock
-import kotlinx.datetime.format.*
+import kotlinx.datetime.format.DayOfWeekNames
+import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
+import kotlinx.datetime.format.char
 import org.liamjd.pi.DisplayMode
 import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.khartoum.KhFont
@@ -12,7 +14,9 @@ import org.liamjd.pi.khartoum.Rotation
 import org.liamjd.pi.khartoum.TextWrapMode
 import platform.posix.uint8_t
 
-@OptIn(ExperimentalForeignApi::class)
+/**
+ * Display the current date and time
+ */
 class Clock(override val id: uint8_t = 6u) : DisplayMode {
     private var black: KhartoumImage = KhartoumImage(0, 0)
     private var red: KhartoumImage = KhartoumImage(0, 0)

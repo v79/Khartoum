@@ -4,9 +4,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.serialization.json.Json
 import org.liamjd.pi.curl.CUrl
-import org.liamjd.pi.encodeBase64
-import org.liamjd.pi.spotify.AccessToken
-import org.liamjd.pi.spotify.currentlyPlaying.CurrentlyPlaying
+import org.liamjd.pi.datasources.spotify.models.CurrentlyPlaying
 import platform.posix.getenv
 
 @ExperimentalForeignApi
@@ -31,7 +29,7 @@ class SpotifyService {
     }
 
     // TODO: These values are hard coded and specific to my Spotify account. They should be removed
-// See https://dev.to/sabareh/how-to-get-the-spotify-refresh-token-176 for instructions on how these values are fetched
+    // See https://dev.to/sabareh/how-to-get-the-spotify-refresh-token-176 for instructions on how these values are fetched
     private val spotifyCode =
         "AQAlR_EO4GCNPBuRrc2jCHZaaLkdOfX2V9b7tcNwTCPPtv1HLICIPsDtaCwUyD4tqrG5VxOOe3dpIrxRbn1KeWAT38dlwFnZWIJQ7CcHqNNUg2mSci7iGDms9Gwc97v9brHA6wSceEbuKa2vS1MVV5rukCxrJqG5Ktj5b_Ji0hffsppCR9LhjgG4R-MTLg_B3-rm69ldnSk"
     private val spotifyRefreshToken =
@@ -45,10 +43,10 @@ class SpotifyService {
         return spotifyClient.isNotEmpty() && spotifySecret.isNotEmpty()
     }
 
+    /**
+     * Given a refresh token, refresh the Spotify access token
+     */
     fun refreshSpotifyToken(): AccessToken? {
-
-        println("\tRefreshing Spotify token")
-
         require(spotifyClient.isNotEmpty()) { "Spotify client ID is empty" }
         require(spotifySecret.isNotEmpty()) { "Spotify secret is empty" }
 
@@ -87,8 +85,6 @@ class SpotifyService {
      * Get initial spotify access token
      */
     private fun getSpotifyToken() {
-        println("\tGetting Spotify token")
-
         val location = "https://accounts.spotify.com/api/token"
         val postData = "grant_type=client_credentials"
         val extraHeaders = arrayListOf(
@@ -114,9 +110,9 @@ class SpotifyService {
         }
     }
 
-    fun getCurrentlyPlayingSong(token: AccessToken): CurrentlyPlaying? {
+    fun getCurrentlyPlayingSong(token: AccessToken, market: String): CurrentlyPlaying? {
         println("\tGetting currently playing song")
-        val location = "https://api.spotify.com/v1/me/player/currently-playing"
+        val location = "https://api.spotify.com/v1/me/player/currently-playing?market=$market&additional_types=track%2Cepisode"
         val extraHeaders = arrayListOf(
             "Authorization: Bearer ${token.token}",
             "Accept: application/json",
@@ -134,16 +130,16 @@ class SpotifyService {
         curl.close()
 
         try {
-            println("\tcurrrently playing: $currentlyPlayingJson")
+            println(currentlyPlayingJson)
             return Json.decodeFromString<CurrentlyPlaying>(currentlyPlayingJson)
         } catch (e: Exception) {
             println(e)
+            println(currentlyPlayingJson)
         }
         return null
     }
 
     private fun getSpotifyAuthScope(): String {
-        println("\tGetting Spotify auth scope")
         val location = "https://accounts.spotify.com/api/token"
         val postData = "grant_type=authorization_code&code=$spotifyCode&redirect_uri=$spotifyRedirectURL"
         val extraHeaders = arrayListOf(

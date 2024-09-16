@@ -10,6 +10,9 @@ import org.liamjd.pi.khartoum.Rotation
 import org.liamjd.pi.khartoum.TextWrapMode
 import platform.posix.uint8_t
 
+/**
+ * Display the currently playing song on Spotify, showing Artist, Title and Album where appropriate, plus track number and total tracks
+ */
 @OptIn(ExperimentalForeignApi::class)
 class Spotify(override val id: uint8_t = 6u) : DisplayMode {
     private var black: KhartoumImage = KhartoumImage(0, 0)
@@ -35,7 +38,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
                 val refreshedToken = spotify.refreshSpotifyToken()
                 if (refreshedToken == null) {
                     println("Failed to refresh token")
-                    black.drawString(
+                    red.drawString(
                         0,
                         0,
                         "Failed to refresh token",
@@ -44,43 +47,58 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
                         wrapMode = TextWrapMode.WRAP
                     )
                 } else {
-                    val currentlyPlaying = spotify.getCurrentlyPlayingSong(refreshedToken)
+                    val currentlyPlaying = spotify.getCurrentlyPlayingSong(refreshedToken,"GB")
 
                     if (currentlyPlaying != null) {
-                        println("${currentlyPlaying.item.name} by ${currentlyPlaying.item.artists?.firstOrNull()?.name} from the album ${currentlyPlaying.item.album?.name}. (Track ${currentlyPlaying.item.trackNumber} of ${currentlyPlaying.item.album?.totalTracks})")
+                        // TODO: Different displays for Tracks or Episodes
+                        if (currentlyPlaying.item != null) {
+                            println("${currentlyPlaying.item.name} by ${currentlyPlaying.item.artists?.firstOrNull()?.name} from the album ${currentlyPlaying.item.album?.name}. (Track ${currentlyPlaying.item.trackNumber} of ${currentlyPlaying.item.album?.totalTracks})")
 
-                        if (currentlyPlaying.item.name != null) {
-                            val drawnTitle = black.drawString(
-                                xStart = 0, yStart = 0,
-                                string = currentlyPlaying.item.name,
-                                font = KhFont.CascadiaCodeSemiBold24,
-                                wrapMode = TextWrapMode.TRUNCATE
-                            )
-                            println("Title dimensions are: $drawnTitle")
-
-                            if (currentlyPlaying.item.album?.name != null) {
-                                val drawnAlbum = red.drawString(
-                                    xStart = 0,
-                                    yStart = drawnTitle.y,
-                                    string = currentlyPlaying.item.album.name,
-                                    font = KhFont.CascadiaMono12,
+                            if (currentlyPlaying.item.name != null) {
+                                val drawnTitle = black.drawString(
+                                    xStart = 0, yStart = 0,
+                                    string = currentlyPlaying.item.name,
+                                    font = KhFont.CascadiaCodeSemiBold24,
                                     wrapMode = TextWrapMode.TRUNCATE
                                 )
-                                println("Album dimensions are: $drawnAlbum")
-                                black.drawString(
-                                    xStart = 0,
-                                    yStart = drawnAlbum.y,
-                                    string = "${currentlyPlaying.item.artists?.firstOrNull()?.name}",
-                                    font = KhFont.CascadiaMono12,
-                                    wrapMode = TextWrapMode.TRUNCATE
-                                )
+                                println("Title dimensions are: $drawnTitle")
+
+                                if (currentlyPlaying.item.album?.name != null) {
+                                    val drawnAlbum = red.drawString(
+                                        xStart = 0,
+                                        yStart = drawnTitle.y,
+                                        string = currentlyPlaying.item.album.name,
+                                        font = KhFont.CascadiaMono12,
+                                        wrapMode = TextWrapMode.TRUNCATE
+                                    )
+                                    println("Album dimensions are: $drawnAlbum")
+                                    black.drawString(
+                                        xStart = 0,
+                                        yStart = drawnAlbum.y,
+                                        string = "${currentlyPlaying.item.artists?.firstOrNull()?.name}",
+                                        font = KhFont.CascadiaMono12,
+                                        wrapMode = TextWrapMode.TRUNCATE
+                                    )
+                                }
+                                currentlyPlaying.item.trackNumber?.let {
+                                    black.drawString(
+                                        xStart = 0,
+                                        yStart = black.height - (KhFont.CascadiaMono12.height + 2),
+                                        string = "Track $it of ${currentlyPlaying.item.album?.totalTracks}",
+                                        font = KhFont.CascadiaMono12,
+                                        wrapMode = TextWrapMode.TRUNCATE
+                                    )
+                                }
                             }
                         }
+                    } else {
+                        // currentlyPlaying.item is NULL but we could have a podcast instead
+
                     }
                 }
             } else {
                 println("Spotify credentials not set")
-                black.drawString(
+                red.drawString(
                     0,
                     0,
                     "Spotify credentials not set",
