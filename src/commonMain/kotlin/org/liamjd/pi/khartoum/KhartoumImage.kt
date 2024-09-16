@@ -29,7 +29,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
         } else {
             (((pixelWidth / 8 + 1) * 16) * pixelHeight)
         }
-        bytes = UByteArray(imageSize.toInt())
+        bytes = UByteArray(imageSize)
         heightByte = pixelHeight
         widthByte = if (pixelWidth % 8 == 0) {
             (pixelWidth / 8)
@@ -394,7 +394,6 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
                 width = pixelHeight
                 height = pixelWidth
             }
-            println("Image cleared with rotation. Image dimensions are ${width}w and ${height}h")
         }
         bytes.fill(zeroByte)
     }
@@ -430,7 +429,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
         var bitColumn = 0
         var pixelColumn = 0
         var page = 1
-        var pageC: Char = 'A'
+        var pageC = 'A'
 
         for (b in 0 until font.bytesPerGlyph) {
             print((font.table[nextBytePtr + b]).toString(16).padStart(2, '0') + ",")
