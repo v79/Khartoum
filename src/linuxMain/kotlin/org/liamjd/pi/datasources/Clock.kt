@@ -30,7 +30,7 @@ class Clock(override val id: uint8_t = 6u) : DisplayMode {
         println(now)
 
         val timeFormat = LocalDateTime.Format {
-            hour(padding = Padding.SPACE)
+            hour(padding = Padding.ZERO)
             char(':')
             minute(padding = Padding.ZERO)
         }
