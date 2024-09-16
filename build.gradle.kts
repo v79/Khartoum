@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "2.0.20"
+    kotlin("plugin.serialization") version "2.0.20"
 }
 
 group = "org.liamjd.pi"
@@ -19,7 +20,7 @@ kotlin {
                     definitionFile.set(project.file("src/nativeInterop/cinterop/libcurl.def"))
                     includeDirs("src/include/curl")
                 }
-                val libbcm by cinterops.creating {
+                val libbcm by creating {
                     definitionFile.set(project.file("src/nativeInterop/cinterop/libbcm.def"))
                 }
             }
@@ -33,10 +34,6 @@ kotlin {
 
     mingwX64()
 
-    /*  jvm() {
-      }*/
-
-
     sourceSets {
         commonMain.dependencies {
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
@@ -44,6 +41,11 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test-common"))
             implementation(kotlin("test-annotations-common"))
+        }
+
+        linuxMain.dependencies {
+            implementation(kotlin("stdlib"))
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
         }
 
         /* jvmTest.dependencies {
