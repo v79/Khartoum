@@ -24,6 +24,27 @@ interface DisplayMode {
     fun refresh(ePaperModel: EPDModel)
 }
 
+/**
+ * A blank display mode which does nothing and displays nothing
+ */
+class Blank(override val id: uint8_t = 0u) : DisplayMode {
+    private var black: KhartoumImage = KhartoumImage(0, 0)
+    private var red: KhartoumImage = KhartoumImage(0, 0)
+
+    override fun toString(): String {
+        return "Blank"
+    }
+
+    override val images
+        get() = arrayOf(black.bytes, red.bytes)
+
+    override fun refresh(ePaperModel: EPDModel) {
+        black = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        red = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
+        black.reset(Rotation.CW)
+        red.reset(Rotation.CW)
+    }
+}
 
 class Spotify(override val id: uint8_t = 6u) : DisplayMode {
     private var black: KhartoumImage = KhartoumImage(0, 0)
