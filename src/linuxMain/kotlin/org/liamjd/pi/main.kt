@@ -1,13 +1,18 @@
 package org.liamjd.pi
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.staticCFunction
 import libbcm.bcm2835_init
 import org.liamjd.pi.console.printErr
 import org.liamjd.pi.datasources.Clock
 import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.ePaper.EPaperDisplay
-import platform.posix.exit
-import platform.posix.sleep
+import platform.posix.*
+
+// The SIGINT and SIGTERM signals are used to gracefully shutdown the application
+// They can only access global variables, so we need to declare the mode variable as global.
+// Defaulting to an empty display mode
+var mode: DisplayMode = Blank()
 
 /**
  * Main entry point for the Raspberry Pi application.
@@ -28,7 +33,15 @@ fun main() {
     val weather = Weather()
     val shutdown = Shutdown()
 
-    var mode: DisplayMode = clockMode
+    // set up SIGTERM and SIGINT handlers
+    signal(SIGINT, staticCFunction<Int, Unit> {
+        shutdownDisplay()
+    })
+    signal(SIGTERM, staticCFunction<Int, Unit> {
+        shutdownDisplay()
+    })
+
+    mode = Clock()
 
     // Initialize the ePaper display
     println("Initializing ePaper display")
@@ -62,7 +75,6 @@ fun main() {
     println("Polling for button presses")
     var seconds = 0u
     do {
-        sleep(1u) // sleep for second
         seconds++
         val buttonPressed = ePaper.pollKeys()
         if (buttonPressed != null) {
@@ -74,15 +86,19 @@ fun main() {
             ePaper.display(mode.images)
             seconds = 0u
         }
+        sleep(1u) // sleep for second
     } while (mode !is Shutdown)
 
-    // Shut down the ePaper display
-    // shut down ePaper
-    println("Shutting down ePaper display and exiting")
-    ePaper.clear()
-    ePaper.sleep()
-    ePaper.exit()
+    ePaper.shutdown()
 
     exit(0)
 
+}
+
+/**
+ * Function to handle the shutdown of the application
+ */
+fun shutdownDisplay() {
+    println("SIGINT or SIGTERM received, shutting down")
+    mode = Shutdown()
 }
