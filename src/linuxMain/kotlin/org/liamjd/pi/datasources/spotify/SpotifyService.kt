@@ -3,6 +3,7 @@ package org.liamjd.pi.datasources.spotify
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
 import kotlinx.serialization.json.Json
+import org.liamjd.pi.console.printDebug
 import org.liamjd.pi.curl.CUrl
 import org.liamjd.pi.datasources.spotify.models.CurrentlyPlaying
 import platform.posix.getenv
@@ -21,11 +22,9 @@ class SpotifyService {
     init {
         spotifyClient = getEnvVariable("SPOTIFY_CLIENT")
         spotifySecret = getEnvVariable("SPOTIFY_SECRET")
-        println("Spotify client: $spotifyClient")
-        println("Spotify secret: $spotifySecret")
+        println("Spotify client: $spotifyClient (secret, auth not shown)")
         spotifyAuthBytes = "$spotifyClient:$spotifySecret".encodeToByteArray()
         spotifyAuth = spotifyAuthBytes.encodeBase64().toKString()
-        println("Spotify auth: $spotifyAuth")
     }
 
     // TODO: These values are hard coded and specific to my Spotify account. They should be removed
@@ -130,7 +129,7 @@ class SpotifyService {
         curl.close()
 
         try {
-            println(currentlyPlayingJson)
+            printDebug(currentlyPlayingJson)
             return Json.decodeFromString<CurrentlyPlaying>(currentlyPlayingJson)
         } catch (e: Exception) {
             println(e)
