@@ -25,6 +25,8 @@ data class Album(
     val id: String?,
     @SerialName("images")
     val images: List<Image> = emptyList(),
+    @SerialName("is_playable")
+    val isPlayable: Boolean? = true,
     @SerialName("name")
     val name: String,
     @SerialName("popularity")
