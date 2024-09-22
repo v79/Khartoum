@@ -18,8 +18,6 @@ sealed class Item {
         val album: Album?,
         @SerialName("artists")
         val artists: List<SimpleArtist>?,
-        @SerialName("available_markets")
-        val availableMarkets: List<String>?,
         @SerialName("disc_number")
         val discNumber: Int?,
         @SerialName("duration_ms")
@@ -37,7 +35,7 @@ sealed class Item {
         @SerialName("is_local")
         val isLocal: Boolean = false,
         @SerialName("is_playable")
-        val isPlayable: Boolean = true,
+        val isPlayable: Boolean? = true,
         @SerialName("linked_from")
         val linkedFrom: TrackLink? = null,
         @SerialName("name")
