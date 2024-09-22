@@ -1,7 +1,6 @@
 package org.liamjd.pi.khartoum
 
 
-
 /**
  * Construct a Khartoum image buffer with the given [pixelWidth] and [pixelHeight]
  * @param pixelWidth the width of the image in pixels
@@ -328,42 +327,25 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
      */
     fun measureString(string: String, font: KhFont, wrapMode: TextWrapMode, rotation: Rotation): DrawDimensions {
         // maximum width of the text in pixels. If it's wider than the display, it will be wrapped or truncated
-        var textWidth = when(rotation) {
-            Rotation.NONE, Rotation.ZERO -> {
-                string.length * font.width
-            }
-            Rotation.CW, Rotation.CCW -> {
-                string.length * font.height
-            }
 
-            Rotation.ONEEIGHTY -> { string.length * font.width}
-        }
+        val charactersPerLine = width / font.width
 
+        var stringRemaining = string
         var textLines = 1
 
-        if (textWidth > width) {
-            when (wrapMode) {
-                TextWrapMode.TRUNCATE -> {
-                    textWidth = width
-                }
-
-                TextWrapMode.ELLIPSIS -> {
-                    // TODO: what to do in ellipsis wrap mode?
-                    textWidth = width
-                }
-
-                TextWrapMode.WRAP -> {
-                    // when wrapping, the text will be split into multiple lines
-                    // but the width of the text will be the same as the display width until I start tokenizing and wrapping over spaces etc
-                    textWidth = width
-                    textLines++
-                }
+        // If the string is wider than the display, and we're not truncating, we need to calculate how many lines it will take
+        if (stringRemaining.length > charactersPerLine || wrapMode != TextWrapMode.TRUNCATE) {
+            while (stringRemaining.length > charactersPerLine) {
+                textLines++
+                stringRemaining = stringRemaining.substring(charactersPerLine)
             }
+        } else {
+            // if the string is less than the width of the display, it's only one line
+            return DrawDimensions(stringRemaining.length * font.width, font.height, 1)
         }
-
         val textHeight = font.height * textLines
 
-        return DrawDimensions(textWidth, textHeight, textLines)
+        return DrawDimensions(charactersPerLine, textHeight, textLines)
     }
 
 
