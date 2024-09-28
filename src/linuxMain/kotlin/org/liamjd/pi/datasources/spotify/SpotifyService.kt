@@ -102,7 +102,7 @@ class SpotifyService {
         curl.close()
 
         try {
-            println("\tAccess token: $accessTokenJson")
+            printDebug("\tAccess token: $accessTokenJson")
             token = Json.decodeFromString<AccessToken>(accessTokenJson)
         } catch (e: Exception) {
             println(e)
@@ -127,6 +127,10 @@ class SpotifyService {
         }
         curl.fetch()
         curl.close()
+
+        if(currentlyPlayingJson.isEmpty()) {
+            return null
+        }
 
         try {
             printDebug(currentlyPlayingJson)

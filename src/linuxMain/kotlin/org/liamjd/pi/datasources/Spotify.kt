@@ -66,7 +66,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
 
                         } else {
                             // currentlyPlaying.item is NULL; no song is playing
-                            printDebug("No song is playing")
+                            println("No song is playing")
                         }
                     }
                 }

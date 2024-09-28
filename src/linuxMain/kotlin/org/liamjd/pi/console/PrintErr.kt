@@ -4,7 +4,7 @@ package org.liamjd.pi.console
 
 import kotlinx.cinterop.ExperimentalForeignApi
 
-
+// TODO: Make this a command line argument
 const val debug: Boolean = false
 
 /**
