@@ -27,4 +27,6 @@ Requires two environment variables to be set:
 - SPOTIFY_CLIENT
 - SPOTIFY_SECRET
 
+Getting these is quite complicated.
+
 Need the `-E` option to be passed to sudo for them to be available.
