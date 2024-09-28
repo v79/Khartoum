@@ -45,30 +45,6 @@ class Blank(override val id: uint8_t = 0u) : DisplayMode {
     }
 }
 
-class Spotify(override val id: uint8_t = 6u) : DisplayMode {
-    private var black: KhartoumImage = KhartoumImage(0, 0)
-    private var red: KhartoumImage = KhartoumImage(0, 0)
-
-    override fun toString(): String {
-        return "Clock"
-    }
-
-    override val images
-        get() = arrayOf(black.bytes, red.bytes)
-
-
-    override fun refresh(ePaperModel: EPDModel) {
-        println("Spotify not implemented yet :)")
-
-        black = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
-        red = KhartoumImage(ePaperModel.pixelWidth, ePaperModel.pixelHeight)
-        black.reset(Rotation.CW)
-        red.reset(Rotation.CW)
-        black.drawString(1, 1, "Spotify", KhFont.CascadiaCodeSemiBold24, false, wrapMode = TextWrapMode.WRAP)
-    }
-}
-
-
 class Weather(override val id: uint8_t = 13u) : DisplayMode {
     private var black: KhartoumImage = KhartoumImage(0, 0)
     private var red: KhartoumImage = KhartoumImage(0, 0)
@@ -92,7 +68,6 @@ class Weather(override val id: uint8_t = 13u) : DisplayMode {
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
 class Shutdown(override val id: uint8_t = 19u) : DisplayMode {
 
     private var black: KhartoumImage = KhartoumImage(0, 0)

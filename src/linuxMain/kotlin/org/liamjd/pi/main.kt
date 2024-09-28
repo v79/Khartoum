@@ -5,6 +5,7 @@ import kotlinx.cinterop.staticCFunction
 import libbcm.bcm2835_init
 import org.liamjd.pi.console.printErr
 import org.liamjd.pi.datasources.Clock
+import org.liamjd.pi.datasources.Spotify
 import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.ePaper.EPaperDisplay
 import platform.posix.*
@@ -41,7 +42,7 @@ fun main() {
         shutdownDisplay()
     })
 
-    mode = Clock()
+    mode = spotify
 
     // Initialize the ePaper display
     println("Initializing ePaper display")
