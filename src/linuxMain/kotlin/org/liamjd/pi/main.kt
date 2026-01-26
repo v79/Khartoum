@@ -10,14 +10,14 @@ import org.liamjd.pi.ePaper.EPDModel
 import org.liamjd.pi.ePaper.EPaperDisplay
 import platform.posix.*
 
-// The SIGINT and SIGTERM signals are used to gracefully shutdown the application
+// The SIGINT and SIGTERM signals are used to gracefully shut down the application
 // They can only access global variables, so we need to declare the mode variable as global.
 // Defaulting to an empty display mode
 var mode: DisplayMode = Blank()
 
 /**
  * Main entry point for the Raspberry Pi application.
- * This initializes the eInk display, and sets up the button actions.
+ * This initialises the eInk display and sets up the button actions.
  * It then enters a loop, waiting for button presses to change the display mode.
  */
 @OptIn(ExperimentalForeignApi::class)
@@ -50,15 +50,19 @@ fun main() {
         it.clear()
         it.delay(2000u)
 
+        // Key 1
         it.buttonActions[5u] = {
             mode = spotify
         }
+        // Key 2
         it.buttonActions[6u] = {
             mode = clockMode
         }
+        // Key 3, not implemented
         it.buttonActions[13u] = {
             mode = weather
         }
+        // Key 4
         it.buttonActions[19u] = {
             mode = shutdown
         }
@@ -87,7 +91,7 @@ fun main() {
             ePaper.display(mode.images)
             seconds = 0u
         }
-        sleep(1u) // sleep for second
+        sleep(1u) // sleep for one second
     } while (mode !is Shutdown)
 
     ePaper.shutdown()
