@@ -8,7 +8,6 @@ import org.liamjd.pi.console.printDebug
 import org.liamjd.pi.curl.CUrl
 import org.liamjd.pi.datasources.spotify.models.CurrentlyPlaying
 import platform.posix.getenv
-import kotlin.collections.plusAssign
 
 @ExperimentalForeignApi
 class SpotifyService {

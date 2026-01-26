@@ -21,6 +21,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
     private val heightByte: Int
     private val imageSize: Int
     private val zeroByte: UByte = 0u
+    private val ellipseCharacterCount = 3
 
     init {
         imageSize = if (pixelWidth % 8 == 0) {
@@ -272,6 +273,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
     /**
      * Write the text [string] starting at co-oridinates [xStart],[yStart] using the font [font]
      * If [invert] is specified, the colours will be inverted, e.g. white-on-black.
+     * The [wrapMode] specifies how text longer than the line length should be handled.
      * Returns an object containing the x and y co-ordinates of the end of the drawn text, and the number of lines needed to draw this.
      */
     fun drawString(
@@ -286,7 +288,6 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
             println("Start or end position is outside of the range of ($width,$height)")
         }
         // TODO: provide basic text wrapping option, would mean tokenizing it a bit?
-//		println("Writing string $string")
         var x: Int = xStart
         var y: Int = yStart
         val characterHeight = font.height + 2
@@ -295,12 +296,20 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
         val maxWidth = width / font.width
 //		println("x: $x, y: $y, h: $h, mw: $maxWidth; current image width: $width")
         for (c in string.toCharArray()) {
+
+            // If the number of characters left to draw is less than the space available, and we're in ellipsis mode, draw the ellipsis and stop drawing
             drawCharacter(x, y, c, font, invert)
             x += font.width
+
+            if (wrapMode == TextWrapMode.ELLIPSIS && (x + (ellipseCharacterCount * font.width) >= width)) {
+                x = drawEllipsis(x, y, font, invert)
+                return DrawDimensions(x, maxY, textLines)
+            }
+
             if (x + font.width > width) {
                 when (wrapMode) {
                     TextWrapMode.WRAP -> {
-                        // move to new line if needed
+                        // move to a new line if needed
                         x = 0
                         y += characterHeight
                         textLines++
@@ -312,7 +321,7 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
                     }
 
                     TextWrapMode.ELLIPSIS -> {
-                        TODO("What to do in ellipsis wrap mode?")
+                        // handled earlier in the flow
                     }
                 }
             }
@@ -482,7 +491,22 @@ class KhartoumImage(private val pixelWidth: Int = 0, private val pixelHeight: In
         }
     }
 
+    /**
+     * Drawn an ellipsis character (...) at the specified [x],[y] position using the specified [font]
+     * If [invert] is specified, the colours will be inverted, e.g. white on black
+     * It will draw three '.' characters, but closely together (half the normal font width spacing)
+     * @return the x co-ordinate of the last character drawn
+     */
+    private fun drawEllipsis(x: Int, y: Int, font: KhFont, invert: Boolean): Int {
+        var xStart = x
+        for (i in 0 until ellipseCharacterCount) {
+            drawCharacter(xStart, y, '.', font, invert)
+            xStart += (font.width / 2)
+        }
+        return xStart
+    }
 }
+
 
 /**
  * ePaper starts in portrait mode

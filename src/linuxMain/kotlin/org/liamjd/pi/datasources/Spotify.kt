@@ -105,7 +105,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
                 xStart = 0, yStart = 0,
                 string = trackObject.name,
                 font = KhFont.CascadiaCodeSemiBold24,
-                wrapMode = TextWrapMode.TRUNCATE
+                wrapMode = TextWrapMode.ELLIPSIS
             )
             if (trackObject.album?.name != null) {
                 val drawnAlbum = red.drawString(
@@ -147,7 +147,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
             xStart = 0, yStart = 0,
             string = episodeObject.name,
             font = KhFont.CascadiaCodeSemiBold24,
-            wrapMode = TextWrapMode.TRUNCATE
+            wrapMode = TextWrapMode.ELLIPSIS
         )
         episodeObject.show.name.let {
             val drawnShow = red.drawString(
