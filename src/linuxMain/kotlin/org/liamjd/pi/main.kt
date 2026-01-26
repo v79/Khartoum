@@ -87,7 +87,7 @@ fun main() {
             ePaper.display(mode.images)
             seconds = 0u
         }
-        sleep(1u) // sleep for second
+        sleep(1u) // sleep for one second
     } while (mode !is Shutdown)
 
     ePaper.shutdown()

@@ -2,7 +2,6 @@ package org.liamjd.pi.datasources
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import org.liamjd.pi.DisplayMode
-import org.liamjd.pi.console.printDebug
 import org.liamjd.pi.datasources.spotify.SpotifyService
 import org.liamjd.pi.datasources.spotify.models.Item
 import org.liamjd.pi.ePaper.EPDModel
@@ -37,7 +36,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
 
         try {
             if (spotify.serviceIsValid()) {
-                val refreshedToken = spotify.refreshSpotifyToken()
+                val refreshedToken = spotify.refreshAccessToken()
                 if (refreshedToken == null) {
                     println("Failed to refresh token")
                     red.drawString(
@@ -65,8 +64,14 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
                             }
 
                         } else {
-                            // currentlyPlaying.item is NULL; no song is playing
-                            println("No song is playing")
+                           black.drawString(
+                               0,
+                               0,
+                               "No currently playing song",
+                               KhFont.CascadiaMono12,
+                               false,
+                               wrapMode = TextWrapMode.WRAP
+                           )
                         }
                     }
                 }
@@ -89,7 +94,7 @@ class Spotify(override val id: uint8_t = 6u) : DisplayMode {
     }
 
     /**
-     * Display music track information - title, albub, artist, track number
+     * Display music track information - title, album, artist, track number
      * @param trackObject the track object to display
      */
     private fun displayTrackInformation(trackObject: Item.TrackObject) {
